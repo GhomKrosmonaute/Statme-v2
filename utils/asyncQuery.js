@@ -9,11 +9,20 @@
  */
 module.exports = function asyncQuery( db, sql, values, options = {} ){
   return new Promise((res,rej) => {
-    this.execute( sql, values, (error, output) => {
+    db.execute( sql, values, (error, output) => {
       if(error) rej(error)
-      if(options.auto && output.length === 1)
-        res(output[0])
-      else res(output)
+      if(options.auto) {
+        if(output.length === 1){
+          const keys = Object.keys(output[0])
+          if(keys.length === 1) res(output[0][keys[0]])
+          else res(output[0])
+        }else{
+          const keys = Object.keys(output[0])
+          if(output.every(data => Object.keys(data).length === 1))
+            res(output.map(data => data[keys[0]]))
+          else res(output)
+        }
+      }else res(output)
     })
   })
 }

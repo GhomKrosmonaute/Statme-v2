@@ -2,7 +2,7 @@
 const asyncQuery = require('./asyncQuery')
 
 /**
- * Messages query generator
+ * Messages query builder
  * @param db
  * @param {Object} [options]
  * @param {string} [options.select]
@@ -12,7 +12,7 @@ const asyncQuery = require('./asyncQuery')
  * @param {boolean} [options.auto]
  * @returns {Promise<any>}
  */
-module.exports = async function getMessages( db, options = {} ){
+module.exports = async function queryBuilder(db, options = {} ){
   
   const select = 'SELECT ' + (options.select || '*') + ' FROM messages'
   const sortBy = options.sortBy ? 'ORDER BY ' + options.sortBy.join(', ') : ''
