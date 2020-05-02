@@ -1,35 +1,27 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title><%= title %></title>
-  <link rel='stylesheet' href='/stylesheets/style.css' />
-</head>
-<body>
-  <h1><%= title %></h1>
-  <p> Invite the
-    <a href="https://discordapp.com/oauth2/authorize?scope=bot&client_id=656877711293284371&permissions=0">
-      Discord bot
-    </a> (ID:656877711293284371) before using this API
-  </p>
-  <h2> How to use this API ? </h2>
-  <ul>
-    <li> Check the <a href="/dashboard"> online dashboard </a> to see stats easily </li>
-    <li> Ask the Discord bot to get stats directly (<a href="/bot">commands</a>) </li>
-    <li> Use <a href="/api"> API routes </a> for build your own visual </li>
-  </ul>
-  <h2> What can this API do ? </h2>
-  <p>
-    All the following statistics are generated from the data that the bot has been able
-    to collect since you invited it to your Discord server. He does not know the
-    messages that were sent before his arrival.
-  </p>
-  <ul>
-    <li> Generate guild statistics </li>
-    <li> Generate user statistics </li>
-    <li> Generate channel statistics </li>
-  </ul>
-  <p>
-    the dashboard allows you to retrieve all these statistics on a single page.
-  </p>
-</body>
-</html>
+<%- include('inc/header', { title, refresh }); %>
+<p> Invite the
+  <a href="https://discordapp.com/oauth2/authorize?scope=bot&client_id=656877711293284371&permissions=0">
+    Discord bot
+  </a> (ID:656877711293284371) before using this API
+</p>
+<h2> How to use this API ? </h2>
+<ul>
+  <li> Check the <a href="/dashboard"> online dashboard </a> to see stats easily </li>
+  <li> Ask the Discord bot to get stats directly (<a href="/bot">commands</a>) </li>
+  <li> Use <a href="/api"> API routes </a> for build your own visual </li>
+</ul>
+<h2> What can this API do ? </h2>
+<p>
+  All the following statistics are generated from the data that the bot has been able
+  to collect since you invited it to your Discord server. He does not know the
+  messages that were sent before his arrival.
+</p>
+<ul>
+  <li> Generate guild statistics </li>
+  <li> Generate user statistics </li>
+  <li> Generate channel statistics </li>
+</ul>
+<p>
+  the dashboard allows you to retrieve all these statistics on a single page.
+</p>
+<%- include('inc/footer'); %>

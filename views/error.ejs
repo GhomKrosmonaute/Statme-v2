@@ -1,14 +1,6 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title><%= error.status %> | <%= message %></title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-</head>
-<body>
-    <h1><%= error.status %> | <%= message %></h1>
-    <% if(error.status != 404){ %>
-        <code><pre><%= error.stack %></pre></code>
-    <% } %>
-</body>
-</html>
+<%- include('inc/header', { title, refresh }); %>
+<% if(error.status != 404){ %>
+    <code><pre><%= error.stack %></pre></code>
+<% } %>
+<%- include('inc/footer') %>
 

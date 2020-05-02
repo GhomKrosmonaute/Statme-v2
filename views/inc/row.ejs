@@ -1,0 +1,13 @@
+<% if(
+  value !== null &&
+  value !== undefined &&
+  String(value).trim().length > 0 &&
+  String(value) != '[object Object]'
+) {
+key = key.replace(/([a-z])([A-Z])/g,(fm,g1,g2)=>`${g1} ${g2}`) %>
+<tr>
+    <th> <%= key[0].toUpperCase() + key.slice(1) %> </th>
+    <td> : </td>
+    <td> <%= value %> </td>
+</tr>
+<% } %>

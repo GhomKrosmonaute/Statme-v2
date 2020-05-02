@@ -1,0 +1,14 @@
+<table>
+    <%
+    if(params){
+        for(const param of params){
+            if(object[param] !== undefined){ %>
+                <%- include('row', { key: param, value: object[param] }); %>
+            <% }
+        }
+    }else{
+        for(const param in object){ %>
+            <%- include('row', { key: param, value: object[param] }); %>
+        <% }
+    } %>
+</table>

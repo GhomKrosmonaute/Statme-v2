@@ -1,0 +1,21 @@
+
+.wrapper {
+    padding-left: 25px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: left;
+    align-items: stretch;
+}
+
+.wrapper > * {
+    display: block;
+    padding: 20px;
+    margin: 20px;
+    border: 2px solid var(--blue);
+    background-color: var(--black);
+}
+
+.wrapper > *:hover {
+    border: 2px solid var(--blue-hover);
+    background-color: var(--trans-light);
+}

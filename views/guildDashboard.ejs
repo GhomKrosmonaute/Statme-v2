@@ -1,10 +1,13 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title><%= title %></title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-</head>
-<body>
-    <h1><%= title %></h1>
-</body>
-</html>
+<%- include('inc/header', { title, refresh }); %>
+<% const icon = guild.iconURL({ dynamic: true, size: 128 }) %>
+<div class="wrapper">
+    <a class="logo" href="<%= icon %>">
+        <img src="<%= icon %>" alt="guild icon" width="128">
+        <h3><%= guild.name %></h3>
+    </a>
+    <%- include('inc/table', {
+        object: guild,
+        params: ['memberCount','large','region','premiumSubscriptionCount','defaultMessageNotifications']
+    }); %>
+</div>
+<%- include('inc/footer'); %>
