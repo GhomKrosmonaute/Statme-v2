@@ -5,12 +5,14 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const fs = require('fs');
 const { Client } = require('discord.js');
+const { createConnection } = require('mysql2')
 
 const secret = require('./secret.json');
 
 const app = express();
 const client = new Client({ disableMentions: "all" });
 const clientReady = client.login(secret.botToken).then(() => console.log('client ready'));
+const db = createConnection(secret.database);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -27,6 +29,7 @@ app.use(async function(req,res,next){
   await clientReady;
   req.client = client;
   req.secret = secret;
+  req.db = db;
   next();
 })
 
