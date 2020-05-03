@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const createError = require('http-errors')
-const getGuildStats = require('../../utils/getGuildStats')
+// const getGuildStats = require('../../utils/getGuildStats')
 const getGraphic = require('../../utils/getGraphic')
 
 router.get('/dashboard/guild/:guildID', async function(req, res, next) {
@@ -21,3 +21,5 @@ router.get('/dashboard/guild/:guildID', async function(req, res, next) {
     guild, graph
   })
 })
+
+module.exports = router

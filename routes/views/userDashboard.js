@@ -15,22 +15,24 @@ router.get('/dashboard/user/:userID', async function(req, res, next){
   const stats = [] // await getUserStats( req.db, user )
   
   // faker
-  for(let i=0; i<100; i+=10){
+  for(let i=0; i<1000; i+=10){
     stats.push({
       period: {
         start: i,
         stop: i + 10,
         duration: 10
       },
-      value: Math.random()
+      value: Math.random() * 100
     })
   }
   
-  const graph = getGraphic(stats,{width:600,height:200})
+  const graph = getGraphic( stats, { width: 600, height: 200 })
   
   res.render('userDashboard', {
-    title: 'Statme Dashboard | @' + user.username,
+    title: 'Statme Dashboard | ' + user.username,
     refresh: '/dashboard/user/' + user.id,
     user, graph
   })
 })
+
+module.exports = router
