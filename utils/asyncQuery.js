@@ -1,16 +1,17 @@
 /**
  * Query promisify
- * @param db
+ * @param {Connection} db
  * @param {string} sql
  * @param {Array} values
  * @param {Object} [options]
  * @param {boolean} [options.auto]
  * @returns {Promise<any>}
  */
-module.exports = function asyncQuery( db, sql, values, options = {} ){
+function asyncQuery( db, sql, values, options = {} ){
   return new Promise((res,rej) => {
     db.execute( sql, values, (error, output) => {
       if(error) rej(error)
+      if(output.length === 0) return false
       if(options.auto) {
         if(output.length === 1){
           const keys = Object.keys(output[0])
@@ -26,3 +27,5 @@ module.exports = function asyncQuery( db, sql, values, options = {} ){
     })
   })
 }
+
+module.exports = asyncQuery
