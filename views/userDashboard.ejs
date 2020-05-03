@@ -1,0 +1,14 @@
+<%- include('inc/header', { title, refresh }); %>
+<% const icon = user.avatarURL({ dynamic: true, size: 128 }) %>
+<div class="wrapper">
+    <a class="logo" href="<%= icon %>">
+        <img src="<%= icon %>" alt="user avatar" width="128">
+        <h3><%= user.username %></h3>
+    </a>
+    <%- include('inc/table', {
+        object: user,
+        params: false
+    }); %>
+    <img src="<%= graph %>" alt="activity graphic">
+</div>
+<%- include('inc/footer'); %>

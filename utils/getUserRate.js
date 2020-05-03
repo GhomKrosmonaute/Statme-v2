@@ -7,7 +7,7 @@ const queryBuilder = require('./queryBuilder')
  * @property {number} period.start
  * @property {number} period.stop
  * @property {number} period.duration
- * @property {number} rate
+ * @property {number} value
  */
 
 /**
@@ -37,7 +37,7 @@ async function getUserRate( db, user, options = {} ){
       stop: Date.now(),
       duration: 0
     },
-    rate: 0
+    value: 0
   }
   
   if(options.total){
@@ -49,7 +49,7 @@ async function getUserRate( db, user, options = {} ){
         stop: Date.now(),
         duration: Date.now() - firstMessageTimestamp
       },
-      rate: await queryBuilder( db, {
+      value: await queryBuilder( db, {
         select: 'COUNT(*) AS total',
         where: { user_id: user.id },
         auto: true
@@ -78,7 +78,7 @@ async function getUserRate( db, user, options = {} ){
           stop: timestamp + period,
           duration: period
         },
-        rate: await queryBuilder( db, {
+        value: await queryBuilder( db, {
           where: `user_id = ? AND created_timestamp > ? AND created_timestamp < ?`,
           values: [ user.id, timestamp, timestamp + period ],
           select: 'COUNT(*) AS total',
