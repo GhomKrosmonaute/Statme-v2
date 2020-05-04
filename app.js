@@ -37,12 +37,10 @@ app.use(async function(req,res,next){
 
 // get item of id param and place it in req object
 const param = function (req, res, next, id) {
-  console.log(id)
   for(const type of ['guild','user','channel']){
     const cache = req.client[type + 's'].cache
     if(cache.has(id)) {
       req[type] = cache.get(id)
-      console.log(req[type])
       break
     }
   }

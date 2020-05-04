@@ -2,93 +2,26 @@
 const queryBuilder = require('./queryBuilder')
 
 /**
- * @typedef {Object} Rate
- * @property {Object} period
- * @property {number} period.start
- * @property {number} period.stop
- * @property {number} period.duration
- * @property {number} value
- */
-
-/**
- * Rate of messages sent per `period` (by default per day)
+ * Get
  * @param {Connection} db
- * @param {User} user
- * @param {Object} [options]
- * @param {number} [options.by] default: 1000 * 60 * 60 * 24
- * @param {boolean} [options.total] default: false
- * @returns {Promise<Rate|Rate[]>}
+ * @param {module:"discord.js".User} user
+ * @param {number} from
+ * @param {number} to
+ * @returns {Promise<Rate>}
  */
-async function getUserRate( db, user, options = {} ){
-    
-  const by = options.by || 1000*60*60*24
-  
-  const firstMessageTimestamp = await queryBuilder( db, {
-    where: { user_id: user.id },
-    sortBy: ['created_timestamp'],
-    select: 'created_timestamp',
-    limit: 1,
-    auto: true
-  })
-  
-  if(!firstMessageTimestamp) return {
-    period: {
-      start: Date.now(),
-      stop: Date.now(),
-      duration: 0
-    },
-    value: 0
-  }
-  
-  if(options.total){
-    // get total rate since first message
-    
-    return {
-      period: {
-        start: firstMessageTimestamp,
-        stop: Date.now(),
-        duration: Date.now() - firstMessageTimestamp
-      },
-      value: await queryBuilder( db, {
-        select: 'COUNT(*) AS total',
-        where: { user_id: user.id },
-        auto: true
-      })
-    }
-    
-  }else{
-    // get all rates since first message for each `by`
-  
-    const fullPeriod = Date.now() - firstMessageTimestamp
-    const period = fullPeriod / by
-  
-    /**
-     * @type {Rate[]}
-     */
-    const results = []
-    
-    for(
-      let timestamp = firstMessageTimestamp;
-      timestamp < Date.now();
-      timestamp += period
-    ){
-      results.push({
-        period: {
-          start: timestamp,
-          stop: timestamp + period,
-          duration: period
-        },
-        value: await queryBuilder( db, {
-          where: `user_id = ? AND created_timestamp > ? AND created_timestamp < ?`,
-          values: [ user.id, timestamp, timestamp + period ],
-          select: 'COUNT(*) AS total',
-          auto: true
-        })
-      })
-    }
-  
-    return results
+async function getUserRate( db, user, from, to ){
+  return {
+    from,
+    to,
+    value: await queryBuilder( db, {
+      where: [
+        { user_id: user.id },
+        { column: 'created_timestamp', operator: ">", value: from },
+        { column: 'created_timestamp', operator: "<", value: to }
+      ],
+      select: 'count(id)',
+      auto: true
+    })
   }
 }
-
 module.exports = getUserRate

@@ -6,32 +6,51 @@ const asyncQuery = require('./asyncQuery')
  * @param {Connection} db
  * @param {Object} [options]
  * @param {string} [options.select]
- * @param {string[]} [options.sortBy]
+ * @param {string[]} [options.order]
  * @param {number} [options.limit]
- * @param {Object|string} [options.where]
+ * @param {(Where|Object.<string,*>)[]|Where|Object.<string,*>|string} [options.where]
  * @param {boolean} [options.auto]
  * @param {Array} [options.values]
  * @returns {Promise<any>}
  */
 function queryBuilder(db, options = {} ){
   
-  const select = 'SELECT ' + (options.select || '*') + ' FROM messages'
-  const sortBy = options.sortBy ? 'ORDER BY ' + options.sortBy.join(', ') : ''
+  const values = []
+  const select = 'SELECT ' + (options.select || '*') + ' FROM message'
+  const order = options.order ? 'ORDER BY ' + options.order.join(', ') : ''
   const limit = options.limit ? 'LIMIT ' + options.limit : ''
-  const where = options.where ? 'WHERE ' + (
-    typeof options.where === 'string' ?
-      options.where :
-      Object.keys(options.where).map( key => {
-        return key + ' = ?'
-      }).join(' AND ')
-  ) : ''
   
-  const sql = `${select} ${where} ${sortBy} ${limit}`.trim()
-  const values = !!where ? (
-    typeof options.where === 'string' ?
-      options.values || [] :
-      Object.values(options.where)
-  ) : []
+  let where = ''
+  if(options.where){
+    if(Array.isArray(options.where)){
+      where = 'WHERE ' + options.where.map( w => {
+        if(w.column){
+          values.push(w.value)
+          return `${w.column} ${w.operator || '='} ?`
+        }else if(
+          typeof w === 'object' &&
+          Object.keys(w).length === 1
+        ){
+          const key = Object.keys(w)[0]
+          values.push(w[key])
+          return `${key} = ?`
+        }
+      }).join(' AND ')
+    }else if(options.where.column){
+      where = `WHERE ${options.where.column} ${options.where.operator || '='} ?`
+    }else if(typeof options.where === 'object'){
+      where = 'WHERE ' + Object.entries(options.where).map( entry => {
+        values.push(entry[1])
+        return `${entry[0]} = ?`
+      }).join(' AND ')
+    }else if(typeof options.where === 'string'){
+      where = `WHERE ${options.where}`
+    }else{
+      throw TypeError('bad options.where format')
+    }
+  }
+  
+  const sql = `${select} ${where} ${order} ${limit}`
   
   return asyncQuery( db, sql, values, options )
   

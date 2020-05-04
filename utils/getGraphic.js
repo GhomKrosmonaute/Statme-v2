@@ -11,32 +11,32 @@ const colors = {
 
 /**
  * Return a graph as string uri
- * @param {Rate[]} data
+ * @param {Stat} stats
  * @param {Object} options
  * @param {number} options.width
  * @param {number} options.height
  * @returns {string}
  */
-function getGraphic( data, options ){
+function getGraphic( stats, options ){
   
   const canvas = createCanvas( options.width, options.height )
   const context = canvas.getContext('2d')
-  const maxValue = Math.max(...data.map(rate => rate.value))
+  const maxValue = Math.max(...stats.rates.map(rate => rate.value))
   
   context.lineWidth = 2
   context.fillStyle = colors.transLight
   context.beginPath()
   context.moveTo(-4, options.height + 4)
-  for(let i=0; i<data.length; i++){
+  for(let i=0; i<stats.rates.length; i++){
     const
-      rate = data[i],
-      x = map(i, 0, data.length - 1, -4, options.width + 4),
+      rate = stats.rates[i],
+      x = map(i, 0, stats.rates.length - 1, -4, options.width + 4),
       y = map(rate.value, 0, maxValue, options.height + 4, -4)
     
     context.lineTo(x, y)
     if(i % 2 === 0)
       context.fillRect( x, 0,
-        options.width / (data.length - 1),
+        options.width / (stats.rates.length - 1),
         options.height
       )
   }

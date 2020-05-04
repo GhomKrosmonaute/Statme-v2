@@ -1,35 +1,58 @@
+
 const queryBuilder = require('./queryBuilder')
 const getUserRate = require('./getUserRate')
+const { TIME } = require('../utils/enums')
 
-async function getUserStats( db, user ){
+/**
+ * Rate of messages sent
+ * @param {Connection} db
+ * @param {module:"discord.js".User} user
+ * @param {Object} [options]
+ * @param {number} [options.from] default: last month
+ * @param {number} [options.to] default: now
+ * @param {TimeIndicator} [options.per] default: DAY
+ * @returns {Promise<Stat>}
+ */
+async function getUserStats( db, user, options = {} ){
   
-  const dayDuration = 1000 * 60 * 60 * 24
+  const from = options.from ? options.from : Date.now() - TIME.MONTH
+  const to = options.to || Date.now()
+  const per = options.per || 'DAY'
+  /**
+   * @type {number}
+   */
+  const perTime = TIME[per]
   
   const total = await queryBuilder( db, {
-    select: 'COUNT(*) AS total',
+    where: [
+      { user_id: user.id },
+      { column: 'created_timestamp', operator: ">", value: from },
+      { column: 'created_timestamp', operator: "<", value: to }
+    ],
+    order: ['created_timestamp'],
+    select: 'count(id)',
     auto: true
   })
   
-  const rates = {
-    total: {
-      day: await getUserRate( db, user, { total: true } ),
-      week: await getUserRate( db, user, { total: true, by: dayDuration * 7 } ),
-      month: await getUserRate( db, user, { total: true, by: dayDuration * 31 } ),
-      year: await getUserRate( db, user, { total: true, by: dayDuration * 365 } )
-    },
-    each: {
-      day: await getUserRate( db, user ),
-      week: await getUserRate( db, user, { by: dayDuration * 7 } ),
-      month: await getUserRate( db, user, { by: dayDuration * 31 } ),
-      year: await getUserRate( db, user, { by: dayDuration * 365 } )
-    }
+  if(total === 0) return {
+    total: 0,
+    per,
+    rates: []
   }
+  
+  /**
+   * @type {Rate[]}
+   */
+  const rates = []
+  
+  for(let i=from; i<to; i+=perTime)
+    rates.push(await getUserRate( db, user, i, i + perTime ))
   
   return {
     total,
+    per,
     rates
   }
-  
 }
 
 module.exports = getUserStats

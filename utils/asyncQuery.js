@@ -11,7 +11,7 @@ function asyncQuery( db, sql, values, options = {} ){
   return new Promise((res,rej) => {
     db.execute( sql, values, (error, output) => {
       if(error) rej(error)
-      if(output.length === 0) return false
+      if(!output || output.length === 0) return false
       if(options.auto) {
         if(output.length === 1){
           const keys = Object.keys(output[0])
