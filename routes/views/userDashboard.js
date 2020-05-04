@@ -4,9 +4,9 @@ const createError = require('http-errors')
 const getUserStats = require('../../utils/getUserStats')
 const getGraphic = require('../../utils/getGraphic')
 
-router.get('/dashboard/user/:userID', async function(req, res, next){
+router.get('/dashboard/user/:id', async function(req, res, next){
   
-  const user = req.client.users.cache.get(req.params.userID)
+  const user = req.user
   if(!user) return next(createError(404))
   
   /**

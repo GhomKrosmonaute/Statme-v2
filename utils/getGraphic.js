@@ -19,17 +19,10 @@ const colors = {
  */
 function getGraphic( data, options ){
   
-  console.table(data)
-  
   const canvas = createCanvas( options.width, options.height )
   const context = canvas.getContext('2d')
   const maxValue = Math.max(...data.map(rate => rate.value))
   
-  // background
-  context.fillStyle = colors.black
-  context.fillRect(0,0,options.width,options.height)
-  
-  // graph line
   context.lineWidth = 2
   context.fillStyle = colors.transLight
   context.beginPath()
@@ -43,8 +36,8 @@ function getGraphic( data, options ){
     context.lineTo(x, y)
     if(i % 2 === 0)
       context.fillRect( x, 0,
-        (options.width - 8) / (data.length - 1),
-        options.height - 4
+        options.width / (data.length - 1),
+        options.height
       )
   }
   context.lineTo(options.width + 4, options.height + 4)

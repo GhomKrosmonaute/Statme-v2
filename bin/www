@@ -4,13 +4,14 @@
  * Module dependencies.
  */
 const app = require('../app');
+const secret = require('../secret.json');
 const debug = require('debug')('statmeapi:server');
 const http = require('http');
 
 /**
  * Get port from environment and store in Express.
  */
-const port = normalizePort(process.env.PORT || '2834');
+const port = normalizePort(process.env.PORT || secret.port);
 app.set('port', port);
 
 /**

@@ -6,6 +6,7 @@ const logger = require('morgan');
 const fs = require('fs');
 const { Client } = require('discord.js');
 const { createConnection } = require('mysql2')
+const initClient = require('./utils/initClient')
 
 const secret = require('./secret.json');
 
@@ -27,17 +28,34 @@ app.use(express.static(path.join(__dirname, 'public')));
 // insert constants
 app.use(async function(req,res,next){
   await clientReady;
-  req.client = client;
+  req.app = app;
+  req.client = initClient(client);
   req.secret = secret;
   req.db = db;
   next();
 })
 
+// get item of id param and place it in req object
+const param = function (req, res, next, id) {
+  console.log(id)
+  for(const type of ['guild','user','channel']){
+    const cache = req.client[type + 's'].cache
+    if(cache.has(id)) {
+      req[type] = cache.get(id)
+      console.log(req[type])
+      break
+    }
+  }
+  next()
+}
+
+app.param('id', param)
+
 for(const file of fs.readdirSync(path.join(__dirname, 'routes', 'views')))
-  app.use('/', require(path.join(__dirname, 'routes', 'views', file)));
+  app.use('/', require(path.join(__dirname, 'routes', 'views', file)).param('id', param));
 
 for(const file of fs.readdirSync(path.join(__dirname, 'routes', 'api')))
-  app.use('/api', require(path.join(__dirname, 'routes', 'api', file)));
+  app.use('/api', require(path.join(__dirname, 'routes', 'api', file)).param('id', param));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
