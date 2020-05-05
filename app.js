@@ -5,15 +5,25 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const fs = require('fs');
 const { Client } = require('discord.js');
-const { createConnection } = require('mysql2')
-const initClient = require('./utils/initClient')
+const { createConnection } = require('mysql2');
+const initClient = require('./utils/initClient');
 
 const secret = require('./secret.json');
 
 const app = express();
-const client = new Client({ disableMentions: "all" });
-const clientReady = client.login(secret.botToken).then(() => console.log('client ready'));
 const db = createConnection(secret.database);
+const client = new Client({
+  disableMentions: "all",
+  presence: {
+    activity: {
+      name: secret.baseURL,
+      type: "WATCHING"
+    }
+  }
+});
+
+const clientReady = client.login(secret.botToken)
+  .then(() => initClient(client,db));
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -27,9 +37,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // insert constants
 app.use(async function(req,res,next){
-  await clientReady;
+  if(!client.ready) await clientReady;
   req.app = app;
-  req.client = initClient(client);
+  req.client = client;
   req.secret = secret;
   req.db = db;
   next();

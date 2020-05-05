@@ -19,12 +19,15 @@ router.get('/dashboard/user/:id', async function(req, res, next){
   const fromDate = moment(from).format('YYYY-MM-DD')
   
   const stats = await getUserStats( req.db, user, {from, to, per})
-  const graph = await getGraphic( stats, { width: 400, height: 200 })
+  const graph = await getGraphic( stats, { width: 400, height: 200 }).toDataURL()
   
-  res.render('userDashboard', {
+  res.render('itemDashboard', {
+    type: 'user',
     title: 'Dashboard | ' + user.username,
-    refresh: `/dashboard/user/${user.id}?from=${from}&per=${per}&to=${to}`,
-    user, graph, fromDate, toDate, per
+    refresh: req.url,
+    item: user,
+    icon: user.avatarURL({ dynamic: true, size: 128 }),
+    graph, fromDate, toDate, per
   })
 })
 

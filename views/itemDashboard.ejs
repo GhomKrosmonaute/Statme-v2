@@ -1,14 +1,13 @@
 <%- include('inc/header', { title, refresh }); %>
-<% const icon = user.avatarURL({ dynamic: true, size: 128 }) %>
 <div class="wrapper">
     <a class="logo" href="<%= icon %>">
-        <img src="<%= icon %>" alt="user avatar" width="128">
-        <h3><%= user.username %></h3>
+        <img src="<%= icon %>" alt="<%= type %> image" width="128">
+        <h3><%= item.username %></h3>
     </a>
     <a href="<%= graph %>" class="graph">
         <img src="<%= graph %>" alt="activity graphic">
     </a>
-    <form action="/dashboard/user/<%= user.id %>" method="get" class="auto-form">
+    <form action="/dashboard/<%= type %>/<%= item.id %>" method="get" class="auto-form">
         <label>From <input type="date" name="from" value="<%= fromDate %>"></label>
         <label>To <input type="date" name="to" value="<%= toDate %>"></label>
         <label>Div

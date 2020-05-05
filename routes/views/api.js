@@ -14,7 +14,7 @@ router.get('/api', function(req, res, next) {
   
   console.log(routes)
   
-  res.render('api', { title: 'Statme API', refresh: false, routes });
+  res.render('api', { title: 'API Routes', refresh: false, routes });
 });
 
 module.exports = router;

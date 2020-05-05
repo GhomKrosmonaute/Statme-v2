@@ -1,5 +1,5 @@
 
-const { createCanvas } = require('canvas')
+const Canvas = require('canvas')
 const map = require('./map')
 const colors = {
   blue: '#4a9eff',
@@ -15,11 +15,11 @@ const colors = {
  * @param {Object} options
  * @param {number} options.width
  * @param {number} options.height
- * @returns {string}
+ * @returns {Canvas}
  */
 function getGraphic( stats, options ){
   
-  const canvas = createCanvas( options.width, options.height )
+  const canvas = Canvas.createCanvas( options.width, options.height )
   const context = canvas.getContext('2d')
   const maxValue = Math.max(...stats.rates.map(rate => rate.value))
   
@@ -46,7 +46,7 @@ function getGraphic( stats, options ){
   context.stroke()
   context.fill()
   
-  return canvas.toDataURL()
+  return canvas
 }
 
 module.exports = getGraphic
