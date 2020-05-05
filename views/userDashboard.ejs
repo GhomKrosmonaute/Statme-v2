@@ -9,8 +9,8 @@
         <img src="<%= graph %>" alt="activity graphic">
     </a>
     <form action="/dashboard/user/<%= user.id %>" method="get" class="auto-form">
-        <label>From <input type="date" name="from" value="<%= Date(from) %>"></label>
-        <label>To <input type="date" name="to" value="<%= Date(to) %>"></label>
+        <label>From <input type="date" name="from" value="<%= fromDate %>"></label>
+        <label>To <input type="date" name="to" value="<%= toDate %>"></label>
         <label>Div
             <select name="per" required>
                 <% for(const indicator of ['DAY','WEEK','MONTH','YEAR']){ %>

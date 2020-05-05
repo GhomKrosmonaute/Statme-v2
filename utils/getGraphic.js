@@ -31,7 +31,7 @@ function getGraphic( stats, options ){
     const
       rate = stats.rates[i],
       x = map(i, 0, stats.rates.length - 1, -4, options.width + 4),
-      y = map(rate.value, 0, maxValue, options.height + 4, -4)
+      y = map(rate.value, 0, maxValue, options.height, 0)
     
     context.lineTo(x, y)
     if(i % 2 === 0)

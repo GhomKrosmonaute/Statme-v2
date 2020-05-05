@@ -8,7 +8,7 @@ const asyncQuery = require('./asyncQuery')
  * @param {string} [options.select]
  * @param {string[]} [options.order]
  * @param {number} [options.limit]
- * @param {(Where|Object.<string,*>)[]|Where|Object.<string,*>|string} [options.where]
+ * @param {(WhereBetween|Where|Object.<string,*>)[]|Where|WhereBetween|Object.<string,*>|string} [options.where]
  * @param {boolean} [options.auto]
  * @param {Array} [options.values]
  * @returns {Promise<any>}
@@ -24,13 +24,15 @@ function queryBuilder(db, options = {} ){
   if(options.where){
     if(Array.isArray(options.where)){
       where = 'WHERE ' + options.where.map( w => {
-        if(w.column){
+        if(typeof w !== 'object')
+          throw Error('bad options.where format')
+        if(w.column && w.value) {
           values.push(w.value)
           return `${w.column} ${w.operator || '='} ?`
-        }else if(
-          typeof w === 'object' &&
-          Object.keys(w).length === 1
-        ){
+        }else if(w.column && w.values){
+          values.push(...w.values)
+          return `${w.column} BETWEEN ? AND ?`
+        }else if(Object.keys(w).length === 1){
           const key = Object.keys(w)[0]
           values.push(w[key])
           return `${key} = ?`
@@ -50,7 +52,12 @@ function queryBuilder(db, options = {} ){
     }
   }
   
-  const sql = `${select} ${where} ${order} ${limit}`
+  const sql = `
+    ${select}
+    ${where}
+    ${order}
+    ${limit}
+  `
   
   return asyncQuery( db, sql, values, options )
   

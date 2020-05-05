@@ -15,9 +15,13 @@ const { TIME } = require('../utils/enums')
  */
 async function getUserStats( db, user, options = {} ){
   
-  const from = options.from ? options.from : Date.now() - TIME.MONTH
+  const from = options.from || Date.now() - TIME.MONTH
   const to = options.to || Date.now()
   const per = options.per || 'DAY'
+  
+  const fromDate = new Date(from).toISOString()
+  const toDate = new Date(to).toISOString()
+  
   /**
    * @type {number}
    */
@@ -26,8 +30,7 @@ async function getUserStats( db, user, options = {} ){
   const total = await queryBuilder( db, {
     where: [
       { user_id: user.id },
-      { column: 'created_timestamp', operator: ">", value: from },
-      { column: 'created_timestamp', operator: "<", value: to }
+      { column: 'created_timestamp', values: [fromDate,toDate] }
     ],
     order: ['created_timestamp'],
     select: 'count(id)',

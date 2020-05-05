@@ -20,5 +20,11 @@
  */
 
 /**
+ * @typedef {Object} WhereBetween
+ * @property {string} column
+ * @property {*[]} values
+ */
+
+/**
  * @typedef {'DAY'|'WEEK'|'MONTH'|'YEAR'} TimeIndicator
  */
