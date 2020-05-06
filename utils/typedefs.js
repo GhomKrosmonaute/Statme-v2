@@ -7,7 +7,10 @@
 
 /**
  * @typedef {Object} Stat
+ * @property {number} max
+ * @property {number} min
  * @property {number} total
+ * @property {number} average
  * @property {TimeIndicator} per
  * @property {Rate[]} rates
  */

@@ -1,4 +1,6 @@
 
+const moment = require('moment')
+const asyncQuery = require('./asyncQuery')
 const queryBuilder = require('./queryBuilder')
 const getUserRate = require('./getUserRate')
 const { TIME } = require('../utils/enums')
@@ -19,8 +21,8 @@ async function getUserStats( db, user, options = {} ){
   const to = options.to || Date.now()
   const per = options.per || 'DAY'
   
-  const fromDate = new Date(from).toISOString()
-  const toDate = new Date(to).toISOString()
+  const toDate = moment(to).format('YYYY-MM-DD')
+  const fromDate = moment(from).format('YYYY-MM-DD')
   
   /**
    * @type {number}
@@ -38,6 +40,9 @@ async function getUserStats( db, user, options = {} ){
   })
   
   if(total === 0) return {
+    min: 0,
+    max: 0,
+    average: 0,
     total: 0,
     per,
     rates: []
@@ -48,10 +53,32 @@ async function getUserStats( db, user, options = {} ){
    */
   const rates = []
   
-  for(let i=from; i<to; i+=perTime)
-    rates.push(await getUserRate( db, user, i, i + perTime ))
+  const raw = await asyncQuery( db, `
+    SELECT
+      ROUND(UNIX_TIMESTAMP(created_timestamp)/${perTime / 1000}) AS t,
+      COUNT(id) as total
+    FROM message
+    WHERE user_id = ?
+    AND created_timestamp BETWEEN ? AND ?
+    GROUP BY t
+    ORDER BY t
+  `, [user.id, fromDate, toDate])
+  
+  let rateIndex = 0
+  for(let i=from; i<to; i+=perTime) {
+    if(!raw[rateIndex]) break
+    rates.push({
+      from: i,
+      to: i + perTime,
+      value: raw[rateIndex].total
+    })
+    rateIndex ++
+  }
   
   return {
+    average: total / rates.length,
+    max: Math.max(...rates.map(rate => rate.value)),
+    min: Math.min(...rates.map(rate => rate.value)),
     total,
     per,
     rates
