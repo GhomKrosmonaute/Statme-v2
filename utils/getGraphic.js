@@ -1,10 +1,12 @@
 
 const Canvas = require('canvas')
 const map = require('./map')
+const constrain = require('./constrain')
 const colors = {
   blue: '#4a9eff',
   blueHover: '#8fdfff',
   transLight: 'rgba(255, 255, 255, 0.03)',
+  transLight2: 'rgba(255, 255, 255, 0.1)',
   white: '#d8fff3',
   black: '#14171a'
 }
@@ -21,10 +23,6 @@ function getGraphic( stats, options ){
   
   const canvas = Canvas.createCanvas( options.width, options.height )
   const context = canvas.getContext('2d')
-  
-  const font = function(size){
-    context.font = `${Math.round(size)}px Arial`
-  }
   
   // background
   context.fillStyle = colors.black
@@ -54,10 +52,12 @@ function getGraphic( stats, options ){
   
     // text value
     if(stats.rates.length < 20){
-      font( isMax ?
-        (options.height / 15) :
-        (options.height / 20)
-      )
+      context.font = `${
+        Math.round( isMax ?
+          (options.height / 15) :
+          (options.height / 20)
+        )
+      }px Arial`
       context.fillStyle = colors.white
       context.textAlign = "center"
       context.fillText(
@@ -77,9 +77,19 @@ function getGraphic( stats, options ){
   context.stroke()
   context.fill()
   
-  // max zone
+  const averageY = map(stats.average, 0, stats.max, options.height, options.height / 5)
+  context.font = `${constrain(20,0,averageY-(options.height/5))}px Impact`
+  context.textAlign = 'left'
+  
+  // zones
   context.fillStyle = colors.transLight
   context.fillRect(0, options.height / 5, options.width, options.height)
+  context.fillRect(0, averageY, options.width, options.height)
+  
+  // texts
+  context.fillStyle = colors.transLight2
+  context.fillText(`Max: ${stats.max}`, 5, (options.height / 5) - 5)
+  context.fillText(`Average: ${stats.average}`, 5, averageY - 5)
   
   return canvas
 }

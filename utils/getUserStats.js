@@ -1,8 +1,6 @@
 
 const moment = require('moment')
 const asyncQuery = require('./asyncQuery')
-const queryBuilder = require('./queryBuilder')
-const getUserRate = require('./getUserRate')
 const { TIME } = require('../utils/enums')
 
 /**
@@ -29,15 +27,14 @@ async function getUserStats( db, user, options = {} ){
    */
   const perTime = TIME[per]
   
-  const total = await queryBuilder( db, {
-    where: [
-      { user_id: user.id },
-      { column: 'created_timestamp', values: [fromDate,toDate] }
-    ],
-    order: ['created_timestamp'],
-    select: 'count(id)',
-    auto: true
-  })
+  const total = await asyncQuery( db, `
+    SELECT COUNT(id) as total
+    FROM message
+    WHERE user_id = ?
+    AND created_timestamp BETWEEN ? AND ?
+  `, [user.id,fromDate,toDate],
+    { auto: true }
+  )
   
   if(total === 0) return {
     min: 0,
@@ -76,7 +73,7 @@ async function getUserStats( db, user, options = {} ){
   }
   
   return {
-    average: total / rates.length,
+    average: Math.round(total / rates.length),
     max: Math.max(...rates.map(rate => rate.value)),
     min: Math.min(...rates.map(rate => rate.value)),
     total,
