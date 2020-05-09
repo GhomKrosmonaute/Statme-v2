@@ -1,0 +1,31 @@
+
+.cols {
+  display: flex;
+}
+
+.cols > div {
+  display: flex;
+  flex-direction: column;
+  justify-items: center;
+}
+
+.cols > div > * {
+  display: block;
+  padding: 20px;
+  margin: 20px;
+  border: 2px solid var(--blue);
+  background-color: var(--black);
+}
+
+.cols > div > *:hover {
+  border: 2px solid var(--blue-hover);
+  background-color: var(--trans-light);
+}
+
+.cols > div:first-child {
+  justify-items: left;
+}
+
+.cols > div:last-child {
+  justify-items: right;
+}

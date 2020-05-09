@@ -7,7 +7,7 @@ const discode = require('../utils/discode')
 const { TIME } = require('../utils/enums')
 const secret = require('../secret.json')
 
-moment.locale('fr')
+moment.locale('en')
 
 function resolveT(T){
   const key = Object.keys(TIME).find( k => {
@@ -35,7 +35,6 @@ async function graph(args) {
   
   if(allRegex.test(args)) {
     options.all = true
-    options.from = 1578383060000
     options.to = Date.now()
   
   }else{
@@ -52,8 +51,7 @@ async function graph(args) {
     options.per = resolveT(T).key
   }
   
-  let target = this.author
-  if(user.length > 2) target = (
+  const target = user.length > 2 ? (
     this.mentions.members.first() ||
     this.mentions.users.first() ||
     this.guild.members.cache.find( member => {
@@ -63,40 +61,49 @@ async function graph(args) {
       return u.username.toLowerCase()
         .includes(user.toLowerCase())
     }) || this.author
-  )
+  ) : this.author
   
   const url = secret.baseURL + '/dashboard/user/' + target.id
   const apiURL = secret.baseURL + '/api/user/' + target.id
   
   const stats = await getUserStats( this.client.db, target, options)
-  const buffer = getGraphic(stats, {width: 450, height: 200}).toBuffer()
+  const buffer = getGraphic(stats).toBuffer()
   const attachment = new MessageAttachment(buffer, 'graph.png')
   
-  delete stats.rates
-  delete stats.per
-  const optionsToShow = {}
-  for(const key in options){
-    if(key === 'to' || key === 'from')
-      optionsToShow[key] = moment(options[key]).fromNow()
-    else optionsToShow[key] = options[key]
+  const optionsToShow = {
+    user: target.username || target.user.username,
+    from: moment(stats.from).format('DD MMMM YYYY'),
+    to: moment(stats.to).format('DD MMMM YYYY'),
+    per: stats.per
+  }
+  
+  const statsToShow = {
+    total: stats.total,
+    average: stats.average,
+    min: stats.min,
+    max: stats.max
   }
   
   const embed = new MessageEmbed()
     .setAuthor(
-      `Graph | ${target.username || target.user.username}`,
+      `Graph | ${optionsToShow.user}`,
       target.avatarURL ?
         target.avatarURL({ dynamic:true }) :
         target.user.avatarURL({ dynamic:true }),
       url
     )
-    .setDescription(`You can get better statistic on [website](${secret.baseURL}) or by [API](${apiURL}) usage.`)
-    .attachFiles([attachment])
+    .setDescription(
+      `You can get better statistic on [website](${secret.baseURL}) or by [API](${apiURL}) usage.\n` +
+      `Git repository: https://github.com/CamilleAbella/Statme-v2`
+    )
+    .attachFiles([attachment, 'public/images/shell.png'])
     .setImage('attachment://graph.png')
-    .addField('Statistics:', discode(YAML.stringify(stats),'yml'), true)
-    .addField('Options:', discode(YAML.stringify(optionsToShow),'yml'), true)
+    .addField(`Statistics by ${optionsToShow.per.toLowerCase()}:`, discode(statsToShow,'yml'), true)
+    .addField('Options:', discode(optionsToShow,'yml'), true)
+    .setColor('')
     .setFooter(
       '[[--user|-u] <name>] [--last|-l [<times>] <Y|M|W>] [--by|-b <M|W|D>] [--all|-a]',
-      this.client.user.avatarURL({ dynamic:true })
+      'attachment://shell.png'
     )
   this.channel.send(embed).catch()
 }

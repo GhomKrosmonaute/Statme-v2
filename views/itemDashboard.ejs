@@ -1,28 +1,34 @@
 <%- include('inc/header', { title, refresh }); %>
-<div class="wrapper">
-    <a class="logo" href="<%= icon %>">
-        <img src="<%= icon %>" alt="<%= type %> image" width="128">
-        <h3><%= item.username %></h3>
-    </a>
-    <a href="<%= graph %>" class="graph">
-        <img src="<%= graph %>" alt="activity graphic">
-    </a>
-    <form action="/dashboard/<%= type %>/<%= item.id %>" method="get" class="auto-form">
-        <label>From <input type="date" name="from" value="<%= fromDate %>"></label>
-        <label>To <input type="date" name="to" value="<%= toDate %>"></label>
-        <label>Div
-            <select name="per" required>
-                <% for(const indicator of ['DAY','WEEK','MONTH','YEAR']){ %>
-                    <option
-                        value="<%= indicator %>"
-                        <% if(indicator === per){ %>
-                            selected
-                        <% } %>
+<div class="cols">
+    <div>
+        <a class="logo" href="<%= icon %>">
+            <img src="<%= icon %>" alt="<%= type %> image" width="128">
+            <h3><%= item.username %></h3>
+        </a>
+        <form action="/dashboard/<%= type %>/<%= item.id %>" method="get" class="auto-form">
+            <label>From <input type="date" name="from" value="<%= fromDate %>"></label>
+            <label>To <input type="date" name="to" value="<%= toDate %>"></label>
+            <label>Div
+                <select name="per" required>
+                    <% for(const indicator of ['DAY','WEEK','MONTH','YEAR']){ %>
+                        <option
+                                value="<%= indicator %>"
+                        <% if(indicator === stats.per){ %>
+                                selected
+                                <% } %>
                         > by <%= indicator.toLowerCase() %>
-                    </option>
-                <% } %>
-            </select>
-        </label>
-    </form>
+                        </option>
+                    <% } %>
+                </select>
+            </label>
+        </form>
+    </div>
+    <div>
+        <a href="<%= graph %>" class="graph">
+            <h3>Messages by <%= stats.per.toLowerCase() %></h3>
+            <img src="<%= graph %>" alt="activity graphic">
+        </a>
+    </div>
 </div>
+
 <%- include('inc/footer'); %>

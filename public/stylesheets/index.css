@@ -1,4 +1,7 @@
 @import "base.css";
-@import "wrapper.css";
+@import "graph.css";
 @import "header.css";
+@import "wrapper.css";
+@import "cols.css";
+@import "form.css";
 @import "logo.css";

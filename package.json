@@ -14,9 +14,11 @@
     "ejs": "~2.6.1",
     "express": "~4.16.1",
     "http-errors": "~1.6.3",
+    "json2toml": "^1.0.6",
     "moment": "^2.25.3",
     "morgan": "~1.9.1",
-    "mysql2": "^2.1.0"
+    "mysql2": "^2.1.0",
+    "tims": "^1.0.4"
   },
   "devDependencies": {
     "json-to-pretty-yaml": "^1.2.2"

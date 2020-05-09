@@ -8,14 +8,14 @@ const { TIME } = require('../utils/enums')
  * @param {Connection} db
  * @param {module:"discord.js".User} user
  * @param {Object} [options]
- * @param {number} [options.from] default: last month
+ * @param {number} [options.from] default: first message
  * @param {number} [options.to] default: now
  * @param {TimeIndicator} [options.per] default: DAY
- * @returns {Promise<Stat>}
+ * @returns {Promise<Statistic>}
  */
 async function getUserStats( db, user, options = {} ){
   
-  const from = options.from || Date.now() - TIME.MONTH
+  const from = options.from || 0
   const to = options.to || Date.now()
   const per = options.per || 'DAY'
   
@@ -48,34 +48,29 @@ async function getUserStats( db, user, options = {} ){
   /**
    * @type {Rate[]}
    */
-  const rates = []
-  
-  const raw = await asyncQuery( db, `
+  const rates = (await asyncQuery( db, `
     SELECT
       ROUND(UNIX_TIMESTAMP(created_timestamp)/${perTime / 1000}) AS t,
-      COUNT(id) as total
+      (MIN(UNIX_TIMESTAMP(created_timestamp))*1000) AS "from",
+      (MAX(UNIX_TIMESTAMP(created_timestamp))*1000) AS "to",
+      COUNT(id) AS "value"
     FROM message
     WHERE user_id = ?
     AND created_timestamp BETWEEN ? AND ?
     GROUP BY t
     ORDER BY t
-  `, [user.id, fromDate, toDate])
-  
-  let rateIndex = 0
-  for(let i=from; i<to; i+=perTime) {
-    if(!raw[rateIndex]) break
-    rates.push({
-      from: i,
-      to: i + perTime,
-      value: raw[rateIndex].total
-    })
-    rateIndex ++
-  }
+  `, [user.id, fromDate, toDate])).map( row => {
+    delete row.t
+    return row
+  })
   
   return {
     average: Math.round(total / rates.length),
     max: Math.max(...rates.map(rate => rate.value)),
     min: Math.min(...rates.map(rate => rate.value)),
+    period: to - rates[0].from,
+    from: rates[0].from,
+    to,
     total,
     per,
     rates

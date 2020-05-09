@@ -6,11 +6,14 @@
  */
 
 /**
- * @typedef {Object} Stat
+ * @typedef {Object} Statistic
+ * @property {number} from
+ * @property {number} to
  * @property {number} max
  * @property {number} min
  * @property {number} total
  * @property {number} average
+ * @property {number} period
  * @property {TimeIndicator} per
  * @property {Rate[]} rates
  */

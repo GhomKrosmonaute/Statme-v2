@@ -1,0 +1,18 @@
+
+form {
+  white-space: nowrap;
+  display: flex !important;
+  flex-direction: column;
+}
+
+form input,
+form select {
+  color: var(--blue);
+  background: none;
+}
+
+form input:hover,
+form select:hover {
+  color: var(--blue-hover);
+}
+

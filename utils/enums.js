@@ -10,3 +10,14 @@ module.exports.TIME = {
   MONTH: DAY * 31,
   YEAR: DAY * 365
 }
+
+module.exports.COLORS = {
+  BLURPLE: '#4a9eff',
+  BLURPLE_HOVER: '#8fdfff',
+  TRANS_LIGHT: 'rgba(255, 255, 255, 0.03)',
+  TRANS_LIGHT_2: 'rgba(255, 255, 255, 0.1)',
+  TRANS_BLACK: 'rgba(0, 0, 0, 0.03)',
+  TRANS_BLACK_2: 'rgba(0, 0, 0, 0.1)',
+  WHITE: '#d8fff3',
+  BLACK: '#14171a'
+}
