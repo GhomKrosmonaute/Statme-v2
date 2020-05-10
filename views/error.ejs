@@ -1,6 +1,6 @@
 <%- include('inc/header', { title, refresh }); %>
 <% if(error.status != 404){ %>
-    <code><pre><%= error.stack %></pre></code>
+    <code><pre><%- error.stack.replace(/\sat\s/g,'\n\nat ') %></pre></code>
 <% } %>
 <%- include('inc/footer') %>
 

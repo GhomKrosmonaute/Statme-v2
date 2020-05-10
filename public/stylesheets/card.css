@@ -1,0 +1,8 @@
+.card {
+  display: flex !important;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  width: 240px;
+  height: 240px;
+}

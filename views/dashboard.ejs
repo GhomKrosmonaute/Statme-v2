@@ -1,7 +1,7 @@
 <%- include('inc/header', { title, refresh }); %>
 <ul>
     <% for(const type of ['users','channels','guilds']){ %>
-        <li><a href="/dashboard/<%= type %>"><%= type %></a></li>
+        <li><a href="/dashboard/list/<%= type %>"><%= type %></a></li>
     <% } %>
 </ul>
 <%- include('inc/footer'); %>

@@ -1,0 +1,12 @@
+<%- include('inc/header', { title, refresh }); %>
+<div class="cols">
+    <div class="stats">
+        // TODO: Stats
+    </div>
+    <div class="wrapper">
+        <% for(const item of items){ %>
+            <%- include('inc/itemCard', { item: item || {} }); %>
+        <% } %>
+    </div>
+</div>
+<%- include('inc/footer'); %>

@@ -1,0 +1,13 @@
+<div class="card">
+    <% if(item.avatarURL || item.iconURL){ %>
+        <% const icon = item.iconURL ? item.iconURL({dynamic:true}) : item.avatarURL({dynamic:true}) %>
+        <a href="<%= icon %>">
+            <img src="<%= icon %>" alt="image" width="128">
+        </a>
+    <% }else{ %>
+        <%- include('../svg/discord'); %>
+    <% } %>
+    <a href="/dashboard/<%= item.id %>">
+        <h3><%= item.name || item.username %></h3>
+    </a>
+</div>

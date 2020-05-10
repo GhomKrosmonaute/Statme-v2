@@ -3,13 +3,13 @@
   display: flex;
 }
 
-.cols > div {
+.cols > * {
   display: flex;
   flex-direction: column;
   justify-items: center;
 }
 
-.cols > div > * {
+.cols > * > * {
   display: block;
   padding: 20px;
   margin: 20px;
@@ -17,15 +17,15 @@
   background-color: var(--black);
 }
 
-.cols > div > *:hover {
+.cols > * > *:hover {
   border: 2px solid var(--blue-hover);
   background-color: var(--trans-light);
 }
 
-.cols > div:first-child {
+.cols > *:first-child {
   justify-items: left;
 }
 
-.cols > div:last-child {
+.cols > *:last-child {
   justify-items: right;
 }

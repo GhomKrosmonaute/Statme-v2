@@ -2,8 +2,7 @@
 .wrapper {
   display: flex;
   flex-wrap: wrap;
-  justify-content: left;
-  align-items: stretch;
+  flex-direction: row;
 }
 
 .wrapper > * {

@@ -16,8 +16,10 @@ module.exports.COLORS = {
   BLURPLE_HOVER: '#8fdfff',
   TRANS_LIGHT: 'rgba(255, 255, 255, 0.03)',
   TRANS_LIGHT_2: 'rgba(255, 255, 255, 0.1)',
+  TRANS_LIGHT_3: 'rgba(255, 255, 255, 0.5)',
   TRANS_BLACK: 'rgba(0, 0, 0, 0.03)',
   TRANS_BLACK_2: 'rgba(0, 0, 0, 0.1)',
+  TRANS_BLACK_3: 'rgba(0, 0, 0, 0.5)',
   WHITE: '#d8fff3',
   BLACK: '#14171a'
 }

@@ -46,24 +46,36 @@ app.use(async function(req,res,next){
 })
 
 // get item of id param and place it in req object
-const param = function (req, res, next, id) {
+const paramID = function (req, res, next, id) {
   for(const type of ['guild','user','channel']){
     const cache = req.client[type + 's'].cache
     if(cache.has(id)) {
-      req[type] = cache.get(id)
+      req.item = cache.get(id)
+      req.type = type
       break
     }
   }
-  next()
+  if(!req.item) next(createError(404));
+  else next()
 }
 
-app.param('id', param)
+const paramType = function (req, res, next, type) {
+  if(/^(?:channel|guild|user)s$/i.test(type))
+    req.type = type
+  if(!req.type) next(createError(404));
+  else next()
+}
 
-for(const file of fs.readdirSync(path.join(__dirname, 'routes', 'views')))
-  app.use('/', require(path.join(__dirname, 'routes', 'views', file)).param('id', param));
+app
+  .param('id', paramID)
+  .param('type', paramType)
 
-for(const file of fs.readdirSync(path.join(__dirname, 'routes', 'api')))
-  app.use('/api', require(path.join(__dirname, 'routes', 'api', file)).param('id', param));
+for(const file of fs.readdirSync(path.join(__dirname, 'routes')))
+  app.use('/',
+    require(path.join(__dirname, 'routes', file))
+      .param('id', paramID)
+      .param('type', paramType)
+  );
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

@@ -11,8 +11,8 @@ const queryBuilder = require('./queryBuilder')
  */
 async function getUserRate( db, user, from, to ){
   
-  const fromDate = new Date(from).toISOString()
-  const toDate = new Date(to).toISOString()
+  const fromDate = moment(from).format('YYYY-MM-DD')
+  const toDate = moment(to).format('YYYY-MM-DD')
   
   return {
     from,

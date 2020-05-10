@@ -1,13 +1,12 @@
 const { MessageEmbed, MessageAttachment } = require('discord.js')
-const YAML = require('json-to-pretty-yaml')
 const moment = require('moment')
-const getUserStats = require('../utils/getUserStats')
+const resolveItem = require('../utils/resolveItem')
+const resolveType = require('../utils/resolveType')
+const getStats = require('../utils/getStats')
 const getGraphic = require('../utils/getGraphic')
 const discode = require('../utils/discode')
 const { TIME } = require('../utils/enums')
 const secret = require('../secret.json')
-
-moment.locale('en')
 
 function resolveT(T){
   const key = Object.keys(TIME).find( k => {
@@ -18,20 +17,25 @@ function resolveT(T){
   }
 }
 
+const idRegex = /--?i(?:d)?\s+(\d+)/i
+const nameRegex = /--?n(?:ame)?\s+(?:([^"\s]+)|(?:"(.+)"))(?:\s|$)/i
+const lastRegex = /--?l(?:ast)?\s+(?:(\d+)\s+)?([YMW])/i
+const byRegex = /--?by?\s+([MWD])/i
+const allRegex = /--?a(?:ll)?/i
+
 async function graph(args) {
   
   const options = {}
   
-  const userRegex = /--?u(?:ser)?\s+([^-]+)/i
-  const lastRegex = /--?l(?:ast)?\s+(?:(\d+)\s+)?([YMW])/i
-  const byRegex = /--?by?\s+([MWD])/i
-  const allRegex = /--?a(?:ll)?/i
-  
-  let user = ''
-  if(userRegex.test(args)) {
-    user = userRegex.exec(args)[1].trim()
-    options.user = user
+  let resolvable
+  if(idRegex.test(args)){
+    resolvable = idRegex.exec(args)[1].trim()
+  }else if(nameRegex.test(args)) {
+    resolvable = nameRegex.exec(args)[1].trim()
   }
+  
+  const item = resolveItem(this.client,resolvable) || this.author
+  const type = resolveType(item)
   
   if(allRegex.test(args)) {
     options.all = true
@@ -51,27 +55,15 @@ async function graph(args) {
     options.per = resolveT(T).key
   }
   
-  const target = user.length > 2 ? (
-    this.mentions.members.first() ||
-    this.mentions.users.first() ||
-    this.guild.members.cache.find( member => {
-      return member.displayName.toLowerCase()
-        .includes(user.toLowerCase())
-    }) || this.client.users.cache.find( u => {
-      return u.username.toLowerCase()
-        .includes(user.toLowerCase())
-    }) || this.author
-  ) : this.author
+  const url = secret.baseURL + '/dashboard/' + item.id
+  const apiURL = secret.baseURL + '/api/' + item.id
   
-  const url = secret.baseURL + '/dashboard/user/' + target.id
-  const apiURL = secret.baseURL + '/api/user/' + target.id
-  
-  const stats = await getUserStats( this.client.db, target, options)
+  const stats = await getStats( this.client.db, item, type, options)
   const buffer = getGraphic(stats).toBuffer()
   const attachment = new MessageAttachment(buffer, 'graph.png')
   
   const optionsToShow = {
-    user: target.username || target.user.username,
+    name: item.name || item.username,
     from: moment(stats.from).format('DD MMMM YYYY'),
     to: moment(stats.to).format('DD MMMM YYYY'),
     per: stats.per
@@ -86,10 +78,12 @@ async function graph(args) {
   
   const embed = new MessageEmbed()
     .setAuthor(
-      `Graph | ${optionsToShow.user}`,
-      target.avatarURL ?
-        target.avatarURL({ dynamic:true }) :
-        target.user.avatarURL({ dynamic:true }),
+      `${type[0].toUpperCase()+type.slice(1)} Graph | ${optionsToShow.name}`,
+      item.avatarURL ? item.avatarURL({ dynamic:true }) : (
+        item.iconURL ? item.iconURL({ dynamic:true }) : (
+          this.client.user.avatarURL({ dynamic:true })
+        )
+      ),
       url
     )
     .setDescription(
@@ -102,7 +96,7 @@ async function graph(args) {
     .addField('Options:', discode(optionsToShow,'yml'), true)
     .setColor('')
     .setFooter(
-      '[[--user|-u] <name>] [--last|-l [<times>] <Y|M|W>] [--by|-b <M|W|D>] [--all|-a]',
+      '([[--id|-i] <id>] | [[--name|-n] (<name>|"<spaced name>")]) [--last|-l [<times>] <Y|M|W>] [--by|-b <M|W|D>] [--all|-a]',
       'attachment://shell.png'
     )
   this.channel.send(embed).catch()

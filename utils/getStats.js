@@ -6,21 +6,22 @@ const { TIME } = require('../utils/enums')
 /**
  * Rate of messages sent
  * @param {Connection} db
- * @param {module:"discord.js".User} user
+ * @param {DiscordItem} item
+ * @param {ItemType} type
  * @param {Object} [options]
  * @param {number} [options.from] default: first message
  * @param {number} [options.to] default: now
  * @param {TimeIndicator} [options.per] default: DAY
  * @returns {Promise<Statistic>}
  */
-async function getUserStats( db, user, options = {} ){
+async function getStats(db, item, type, options = {} ){
   
   const from = options.from || 0
   const to = options.to || Date.now()
   const per = options.per || 'DAY'
   
-  const toDate = moment(to).format('YYYY-MM-DD')
   const fromDate = moment(from).format('YYYY-MM-DD')
+  const toDate = moment(to).format('YYYY-MM-DD')
   
   /**
    * @type {number}
@@ -30,18 +31,21 @@ async function getUserStats( db, user, options = {} ){
   const total = await asyncQuery( db, `
     SELECT COUNT(id) as total
     FROM message
-    WHERE user_id = ?
+    WHERE ${type}_id = ?
     AND created_timestamp BETWEEN ? AND ?
-  `, [user.id,fromDate,toDate],
+  `, [item.id,fromDate,toDate],
     { auto: true }
   )
   
   if(total === 0) return {
     min: 0,
     max: 0,
+    from,
+    to,
     average: 0,
     total: 0,
     per,
+    period: 0,
     rates: []
   }
   
@@ -55,11 +59,11 @@ async function getUserStats( db, user, options = {} ){
       (MAX(UNIX_TIMESTAMP(created_timestamp))*1000) AS "to",
       COUNT(id) AS "value"
     FROM message
-    WHERE user_id = ?
+    WHERE ${type}_id = ?
     AND created_timestamp BETWEEN ? AND ?
     GROUP BY t
     ORDER BY t
-  `, [user.id, fromDate, toDate])).map( row => {
+  `, [item.id, fromDate, toDate])).map( row => {
     delete row.t
     return row
   })
@@ -77,4 +81,4 @@ async function getUserStats( db, user, options = {} ){
   }
 }
 
-module.exports = getUserStats
+module.exports = getStats

@@ -9,8 +9,9 @@ router.get('/api', function(req, res, next) {
   const routes = req.app._router.stack
     .filter(r => r.name === 'router')
     .map(r => r.handle.stack)
-    .flat(1)
+    .flat()
     .map(r => r.route)
+    .flat()
   
   console.log(routes)
   

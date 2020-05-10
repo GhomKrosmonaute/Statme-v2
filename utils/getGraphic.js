@@ -27,7 +27,7 @@ function getGraphic( stats, options = {} ){
   const graph = Canvas.createCanvas( width, height * .9 )
   const context = graph.getContext('2d')
   
-  //
+  // séparer par zones (heures, jours, semaines, mois, années) le header du graph
   
   // background
   context.fillStyle = COLORS.BLACK
