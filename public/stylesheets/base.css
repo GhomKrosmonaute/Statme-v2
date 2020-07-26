@@ -30,6 +30,10 @@ a:hover {
 body {
   font-family: "Source Code Pro", sans-serif;
   background-color: var(--black);
+  background-image: url("/images/background.jpg");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
   color: var(--white);
   padding-top: 40px;
   padding-left: 50px;

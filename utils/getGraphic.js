@@ -2,8 +2,8 @@
 
 let Canvas = require('canvas')
 const tims = require('tims')
-const map = require('./map')
-const constrain = require('./constrain')
+const map = require('./math/map')
+const constrain = require('./math/constrain')
 const {COLORS} = require('./enums')
 
 /**
@@ -102,7 +102,7 @@ function getGraphic( stats, options = {} ){
   context.fillRect(0, averageY, graph.width, graph.height)
   
   // max, min and average
-  context.font = `${constrain(graph.height/5, 0, averageY - (graph.height * .2))}px Impact`
+  context.font = `${graph.height * .2}px Impact`
   context.textAlign = 'left'
   context.fillStyle = COLORS.TRANS_LIGHT_2
   context.textBaseline = 'top'

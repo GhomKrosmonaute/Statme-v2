@@ -1,11 +1,25 @@
 <%- include('inc/header', { title, refresh }); %>
 <div class="cols">
     <div class="stats">
-        // TODO: Stats
+        <form action="/dashboard/list/<%= type %>" method="get">
+            <h3>Search Engine</h3>
+            <label>
+                <input type="radio" name="sort" value="activity" <%= sort === 'activity' ? 'checked' : '' %>>
+                Sort by activity
+            </label>
+            <label>
+                <input type="radio" name="sort" value="name" <%= sort === 'name' ? 'checked' : '' %>>
+                Sort by name
+            </label>
+            <input placeholder="Search by name" type="text" name="search" value="<%= search || '' %>">
+            <input type="submit" value="Apply filters 🔍">
+        </form>
     </div>
     <div class="wrapper">
         <% for(const item of items){ %>
-            <%- include('inc/itemCard', { item: item || {} }); %>
+            <% if(item){ %>
+                <%- include('inc/itemCard', { item }); %>
+            <% } %>
         <% } %>
     </div>
 </div>

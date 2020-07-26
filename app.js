@@ -6,12 +6,13 @@ const logger = require('morgan');
 const fs = require('fs');
 const { Client } = require('discord.js');
 const { createConnection } = require('mysql2');
-const initClient = require('./utils/initClient');
+const initClient = require('./utils/discord/initClient');
 
 const secret = require('./secret.json');
 
 const app = express();
 const db = createConnection(secret.database);
+db.config.namedPlaceholders = true;
 const client = new Client({
   disableMentions: "all",
   presence: {
@@ -38,6 +39,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // insert constants
 app.use(async function(req,res,next){
   if(!client.ready) await clientReady;
+  req.debug = (secret.debugPassword === req.query.debug);
   req.app = app;
   req.client = client;
   req.secret = secret;
@@ -46,16 +48,21 @@ app.use(async function(req,res,next){
 })
 
 // get item of id param and place it in req object
-const paramID = function (req, res, next, id) {
-  for(const type of ['guild','user','channel']){
-    const cache = req.client[type + 's'].cache
-    if(cache.has(id)) {
-      req.item = cache.get(id)
+const paramID = async function (req, res, next, id) {
+  for(const type of ['guild','channel','user']){
+    const list = req.client[type + 's']
+    req.item = list.cache.get(id)
+    if(!req.item && list.fetch) {
+      try{
+        req.item = await list.fetch(id, false)
+      }catch(error){}
+    }
+    if(req.item) {
       req.type = type
       break
     }
   }
-  if(!req.item) next(createError(404));
+  if(!req.type) next(createError(404));
   else next()
 }
 
@@ -92,7 +99,8 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error', {
     title: `${err.status || 500} | ${err.message}`,
-    refresh: req.url
+    refresh: req.url,
+    debug: req.debug
   });
 });
 

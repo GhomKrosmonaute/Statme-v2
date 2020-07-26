@@ -1,6 +1,6 @@
 <div class="card">
-    <% if(item.avatarURL || item.iconURL){ %>
-        <% const icon = item.iconURL ? item.iconURL({dynamic:true}) : item.avatarURL({dynamic:true}) %>
+    <% if(item.displayAvatarURL || item.iconURL){ %>
+        <% var icon = item.iconURL ? item.iconURL({dynamic:true}) : item.displayAvatarURL({dynamic:true}) %>
         <a href="<%= icon %>">
             <img src="<%= icon %>" alt="image" width="128">
         </a>

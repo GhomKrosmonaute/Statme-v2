@@ -1,8 +1,7 @@
 const express = require('express')
-const Discord = require('discord.js')
 const router = express.Router()
 const moment = require('moment')
-const createError = require('http-errors')
+const resolve = require('../utils/resolveType')
 const getStats = require('../utils/getStats')
 const getGraphic = require('../utils/getGraphic')
 const { TIME } = require('../utils/enums')
@@ -12,12 +11,8 @@ router.get([
   '/api/:id'
 ], async function(req, res, next){
   
-  if(!req.type) return next()
-  
-  /** @type {DiscordItem} */
   const item = req.item
-  /** @type {ItemType} */
-  const type = req.type
+  const type = resolve(item)
   
   const from = new Date(req.query.from).getTime() || (Date.now() - TIME.MONTH)
   const to = new Date(req.query.to).getTime() || Date.now()
@@ -26,7 +21,7 @@ router.get([
   const toDate = moment(to).format('YYYY-MM-DD')
   const fromDate = moment(from).format('YYYY-MM-DD')
   
-  let stats = await getStats( req.db, item, type, {from, to, per})
+  let stats = await getStats( req.db, item, {from, to, per})
   const graph = getGraphic( stats ).toDataURL()
   
   if(/\/api\//i.test(req.url))

@@ -6,18 +6,21 @@ const asyncQuery = require('./asyncQuery')
  * @param {Connection} db
  * @param {Object} [options]
  * @param {string} [options.select]
+ * @param {string} options.from
  * @param {string[]} [options.order]
+ * @param {string} [options.group]
  * @param {number} [options.limit]
  * @param {(WhereBetween|Where|Object.<string,*>)[]|Where|WhereBetween|Object.<string,*>|string} [options.where]
  * @param {boolean} [options.auto]
- * @param {Array} [options.values]
  * @returns {Promise<any>}
  */
 function queryBuilder(db, options = {} ){
   
   const values = []
-  const select = 'SELECT ' + (options.select || '*') + ' FROM message'
+  const select = 'SELECT ' + (options.select.replace(/\w+/g,(fm)=>'`'+fm+'`') || '*')
+  const from = 'FROM `' + options.from + '`'
   const order = options.order ? 'ORDER BY ' + options.order.join(', ') : ''
+  const group = options.group ? 'GROUP BY ' + options.group : ''
   const limit = options.limit ? 'LIMIT ' + options.limit : ''
   
   let where = ''
@@ -54,7 +57,9 @@ function queryBuilder(db, options = {} ){
   
   const sql = `
     ${select}
+    ${from}
     ${where}
+    ${group}
     ${order}
     ${limit}
   `

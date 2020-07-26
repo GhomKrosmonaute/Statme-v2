@@ -1,10 +1,9 @@
 const { MessageEmbed, MessageAttachment } = require('discord.js')
 const moment = require('moment')
-const resolveItem = require('../utils/resolveItem')
 const resolveType = require('../utils/resolveType')
 const getStats = require('../utils/getStats')
 const getGraphic = require('../utils/getGraphic')
-const discode = require('../utils/discode')
+const discode = require('../utils/discord/discode')
 const { TIME } = require('../utils/enums')
 const secret = require('../secret.json')
 
@@ -22,8 +21,9 @@ const nameRegex = /--?n(?:ame)?\s+(?:([^"\s]+)|(?:"(.+)"))(?:\s|$)/i
 const lastRegex = /--?l(?:ast)?\s+(?:(\d+)\s+)?([YMW])/i
 const byRegex = /--?by?\s+([MWD])/i
 const allRegex = /--?a(?:ll)?/i
+// TODO: type regex
 
-async function graph(args) {
+async function graph( args ) {
   
   const options = {}
   
@@ -31,10 +31,27 @@ async function graph(args) {
   if(idRegex.test(args)){
     resolvable = idRegex.exec(args)[1].trim()
   }else if(nameRegex.test(args)) {
-    resolvable = nameRegex.exec(args)[1].trim()
+    const match = nameRegex.exec(args)
+    resolvable = (match[1]||match[2]).trim()
   }
   
-  const item = resolveItem(this.client,resolvable) || this.author
+  // TODO: use type regex
+  const id = await query( this.client.db, `
+    SELECT
+      guild.id as guild_id,
+      
+    FROM message
+    LEFT JOIN
+  `)
+  
+  // TODO: if type === ? then do that
+  const resolved = (
+    this.client.guilds.cache.get(id) ||
+    await this.client.channels.fetch(id, false) ||
+    await this.client.users.fetch(id, false)
+  )
+  
+  const item = resolved || this.author
   const type = resolveType(item)
   
   if(allRegex.test(args)) {

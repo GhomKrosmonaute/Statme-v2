@@ -1,43 +1,31 @@
 
-const moment = require('moment')
-const asyncQuery = require('./asyncQuery')
+const count = require('./messageCount')
+const resolve = require('./resolveType')
+const query = require('./database/asyncQuery')
 const { TIME } = require('../utils/enums')
 
 /**
  * Rate of messages sent
  * @param {Connection} db
- * @param {DiscordItem} item
- * @param {ItemType} type
+ * @param {*} item
  * @param {Object} [options]
  * @param {number} [options.from] default: first message
  * @param {number} [options.to] default: now
  * @param {TimeIndicator} [options.per] default: DAY
  * @returns {Promise<Statistic>}
  */
-async function getStats(db, item, type, options = {} ){
+async function getStats(db, item, options = {} ){
   
+  const type = resolve(item)
   const from = options.from || 0
   const to = options.to || Date.now()
   const per = options.per || 'DAY'
-  
-  const fromDate = moment(from).format('YYYY-MM-DD')
-  const toDate = moment(to).format('YYYY-MM-DD')
-  
-  /**
-   * @type {number}
-   */
   const perTime = TIME[per]
   
-  const total = await asyncQuery( db, `
-    SELECT COUNT(id) as total
-    FROM message
-    WHERE ${type}_id = ?
-    AND created_timestamp BETWEEN ? AND ?
-  `, [item.id,fromDate,toDate],
-    { auto: true }
-  )
+  const { value: total } = await count( db, item, from, to )
   
   if(total === 0) return {
+    type,
     min: 0,
     max: 0,
     from,
@@ -52,23 +40,24 @@ async function getStats(db, item, type, options = {} ){
   /**
    * @type {Rate[]}
    */
-  const rates = (await asyncQuery( db, `
+  const rates = await query( db, `
     SELECT
-      ROUND(UNIX_TIMESTAMP(created_timestamp)/${perTime / 1000}) AS t,
-      (MIN(UNIX_TIMESTAMP(created_timestamp))*1000) AS "from",
-      (MAX(UNIX_TIMESTAMP(created_timestamp))*1000) AS "to",
-      COUNT(id) AS "value"
+      ROUND(message.created_timestamp/${perTime}) AS t,
+      MIN(message.created_timestamp) AS "from",
+      MAX(message.created_timestamp) AS "to",
+      COUNT(message.id) AS "value"
     FROM message
-    WHERE ${type}_id = ?
-    AND created_timestamp BETWEEN ? AND ?
-    GROUP BY t
-    ORDER BY t
-  `, [item.id, fromDate, toDate])).map( row => {
-    delete row.t
-    return row
-  })
+    LEFT JOIN ${type}
+    ON ${type}.\`index\` = message.${type}_index
+    WHERE ${type}.id = ?
+    AND message.created_timestamp
+    BETWEEN ? AND ?
+    ORDER BY t GROUP BY t`,
+    [ item.id, from, to ]
+  )
   
   return {
+    type,
     average: Math.round(total / rates.length),
     max: Math.max(...rates.map(rate => rate.value)),
     min: Math.min(...rates.map(rate => rate.value)),

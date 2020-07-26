@@ -2,7 +2,7 @@
 <div class="cols">
     <div>
         <%- include('inc/itemCard', { item }); %>
-        <form action="/dashboard/<%= type %>/<%= item.id %>" method="get" class="auto-form">
+        <form action="/dashboard/<%= item.id %>" method="get" class="auto-form">
             <label>From <input type="date" name="from" value="<%= fromDate %>"></label>
             <label>To <input type="date" name="to" value="<%= toDate %>"></label>
             <label>Div

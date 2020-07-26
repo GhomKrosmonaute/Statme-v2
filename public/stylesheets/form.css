@@ -5,6 +5,11 @@ form {
   flex-direction: column;
 }
 
+form input {
+  padding: 5px 0;
+  margin: 5px 0;
+}
+
 form input,
 form select {
   color: var(--blue);
@@ -15,4 +20,15 @@ form input:hover,
 form select:hover {
   color: var(--blue-hover);
 }
+
+form input[type="text"] {
+  text-align: center;
+  box-shadow: inset 0 0 3px var(--blue);
+}
+
+form input[type="submit"]:hover,
+form input[type="text"]:hover {
+  background-color: var(--trans-light);
+}
+
 

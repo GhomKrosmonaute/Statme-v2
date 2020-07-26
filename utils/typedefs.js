@@ -34,11 +34,3 @@
 /**
  * @typedef {'DAY'|'WEEK'|'MONTH'|'YEAR'} TimeIndicator
  */
-
-/**
- * @typedef {'user'|'guild'|'channel'} ItemType
- */
-
-/**
- * @typedef {Guild|Channel|User} DiscordItem
- */

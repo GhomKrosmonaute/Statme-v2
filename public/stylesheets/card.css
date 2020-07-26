@@ -3,6 +3,12 @@
   flex-direction: column;
   justify-content: space-around;
   align-items: center;
+  overflow: hidden;
   width: 240px;
   height: 240px;
+}
+
+.card h3 {
+  min-height: 15px;
+  min-width: 30px;
 }

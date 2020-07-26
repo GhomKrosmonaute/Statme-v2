@@ -15,7 +15,7 @@ router.get('/api', function(req, res, next) {
   
   console.log(routes)
   
-  res.render('api', { title: 'API Routes', refresh: false, routes });
+  res.render('api', { title: 'API Routes', refresh: false, routes, debug: req.debug });
 });
 
 module.exports = router;
